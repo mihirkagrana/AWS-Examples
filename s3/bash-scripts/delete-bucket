@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+echo "== delete all objects in bucket"
+
+#Exit immediately if command returns any non-zero exit status
+set -e
+
+#Check for bucket name
+#-z checks if the string length is zero
+if [ -z "$1" ]; then
+    echo "There needs to be a bucket name"
+    exit 1
+fi
+
+BUCKET_NAME="$1"
+
+aws s3api list-objects-v2 \
+--bucket "$BUCKET_NAME" \
+--query 'Contents[].Key' \
+--output json \
+| jq '{Objects: map({Key: .})}' > delete-objects.json
+
+aws s3api delete-objects --bucket $BUCKET_NAME --delete file://delete-objects.json
