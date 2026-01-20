@@ -1,0 +1,16 @@
+{
+  "Grants": [
+    {
+      "Grantee": {
+        "DisplayName": "AWS2",
+        "ID": "257de29f59c4224f769b38ae207b7225e3e2f1673286bf6f2de468db2aaffa2c",
+        "Type": "CanonicalUser"
+      },
+      "Permission": "FULL_CONTROL"
+    }
+  ],
+  "Owner": {
+    "DisplayName": "mihirkagrana",
+    "ID": "6487474a1ac3c78db4c934dc15ea2d2b404159a2ce056fa21767bbca3fd6a82b"
+  }
+}
