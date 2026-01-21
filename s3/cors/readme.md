@@ -19,10 +19,20 @@ aws s3api put-public-access-block \
 ```
 
 ## Add bucket policy to allow public read access
+```md
 aws s3api put-bucket-policy --bucket aws-example-cors-mk --policy file://bucket-policy.json
+```
 
 ## Check if website is accessible. Post request should give CORS error.
-http://aws-example-cors-mk.s3-website.ap-south-1.amazonaws.com/
+## http://aws-example-cors-mk.s3-website.ap-south-1.amazonaws.com/
 
 ## Add CORS policy to bucket.
+```md
 aws s3api put-bucket-cors --bucket aws-example-cors-mk --cors-configuration file://cors-policy.json
+```
+
+## Cleanup
+```md
+../bash-scripts/delete-bucket aws-example-cors-mk
+aws s3 rb s3://aws-example-cors-mk
+```

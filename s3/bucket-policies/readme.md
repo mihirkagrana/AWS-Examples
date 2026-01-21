@@ -13,3 +13,6 @@ aws s3api put-bucket-policy --bucket aws-example-bucket-policy-mk --policy file:
 ## to check if user can access the bucket.
 ## Todo: Getting permission denied error. Need to fix it.
 aws s3 ls aws-example-bucket-policy-mk
+
+## Cleanup
+aws s3 rb s3://aws-example-bucket-policy-mk
