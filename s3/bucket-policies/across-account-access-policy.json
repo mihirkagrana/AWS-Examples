@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CrossAccontBucketAccess",
+      "Effect": "Allow",
+      "Principal": 
+      {
+        "AWS":"arn:aws:iam::423623840251:user/mihir"
+      },
+      "Action":"s3:ListBucket",
+      "Resource":"arn:aws:s3:::aws-example-bucket-policy-mk"
+    },
+    {
+      "Sid": "CrossAccontBucketAccess",
+      "Effect": "Allow",
+      "Principal": 
+      {
+        "AWS":"arn:aws:iam::423623840251:user/mihir"
+      },
+      "Action": 
+      [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource":"arn:aws:s3:::aws-example-bucket-policy-mk/*"
+    }
+  ]
+}

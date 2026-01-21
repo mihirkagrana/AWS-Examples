@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PetStore API Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        button {
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        pre {
+            background: #eee;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>PetStore POST API Demo</h1>
+
+    <p>
+        This is a simple demo page that sends a POST request to the PetStore API
+        using JavaScript <code>fetch</code>.
+    </p>
+
+    <label for="name">Pet Name</label>
+    <input type="text" id="name" placeholder="e.g. Bruno">
+
+    <label for="type">Pet Type</label>
+    <input type="text" id="type" placeholder="e.g. Dog">
+
+    <label for="age">Pet Age</label>
+    <input type="number" id="age" placeholder="e.g. 3">
+
+    <label for="price">Pet Price</label>
+    <input type="number" id="price" placeholder="e.g. 10">
+
+    <button onclick="createPet()">Create Pet</button>
+
+    <h3>API Response</h3>
+    <pre id="response">No response yet</pre>
+
+    <script>
+        async function createPet() {
+            const petData = {
+                name: document.getElementById("name").value,
+                type: document.getElementById("type").value,
+                age: Number(document.getElementById("age").value)
+            };
+
+            try {
+                const response = await fetch(
+                    "http://petstore.execute-api.ap-south-1.amazonaws.com/petstore/pets",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(petData)
+                    }
+                );
+
+                const result = await response.json();
+                document.getElementById("response").textContent =
+                    JSON.stringify(result, null, 2);
+
+            } catch (error) {
+                document.getElementById("response").textContent =
+                    "Error calling API: " + error.message;
+            }
+        }
+    </script>
+
+</body>
+</html>
