@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Check if the argument is provided while calling this script
+if [ -z "$1" ]; then
+    echo "Argument is not provided"
+else
+    export VPC_ID="$1"
+fi
+
+# Delete VPC
+aws ec2 delete-vpc --vpc-id $VPC_ID
