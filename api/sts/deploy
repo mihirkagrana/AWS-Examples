@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+aws cloudformation deploy \
+--template-file template.yaml \
+--region ap-south-1 \
+--stack-name sts-stack \
+--capabilities CAPABILITY_IAM
