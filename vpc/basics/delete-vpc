@@ -2,10 +2,56 @@
 
 # Check if the argument is provided while calling this script
 if [ -z "$1" ]; then
-    echo "Argument is not provided"
+    echo "VPC ID is not provided"
 else
     export VPC_ID="$1"
 fi
+
+if [ -z "$2" ]; then
+    echo "IGW ID is not provided"
+else
+    export IGW_ID="$2"
+fi
+
+if [ -z "$3" ]; then
+    echo "SUBNET ID is not provided"
+else
+    export SUBNET_ID="$3"
+fi
+
+if [ -z "$4" ]; then
+    echo "Route Table ID is not provided"
+else
+    export RT_ID="$4"
+fi
+
+# Find the association ID
+ASSOC_ID=$(aws ec2 describe-route-tables \
+  --route-table-ids "$RT_ID" \
+  --query 'RouteTables[0].Associations[?SubnetId!=`null`].RouteTableAssociationId' \
+  --output text)
+
+# Disassociate route table from subnet
+aws ec2 disassociate-route-table \
+  --association-id "$ASSOC_ID"
+
+# Delete the route table
+# This will not work as its main route table
+# aws ec2 delete-route-table \
+#   --route-table-id "$RT_ID"
+
+# Delete the subnet
+aws ec2 delete-subnet \
+  --subnet-id "$SUBNET_ID"
+
+# Detach the Internet Gateway from the VPC
+aws ec2 detach-internet-gateway \
+  --internet-gateway-id "$IGW_ID" \
+  --vpc-id "$VPC_ID"
+
+# Delete the Internet Gateway
+aws ec2 delete-internet-gateway \
+  --internet-gateway-id "$IGW_ID"
 
 # Delete VPC
 aws ec2 delete-vpc --vpc-id $VPC_ID
