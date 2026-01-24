@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 instance in existing VPC with AL2023, SSM access, public IP, and Apache installed
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-06aa854f8498227d9
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0cc6024afa33ed995
+
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    Description: EC2 instance type
+
+Resources:
+  ## Security Group
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH, HTTP and HTTPS from anywhere
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: ec2-web-sg
+
+  ## EC2 Instance
+  WebEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+
+      ## Latest Amazon Linux 2023 AMI via SSM
+      ImageId: !Sub "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64}}"
+
+      ## Ensure Public IP
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref WebSecurityGroup
+
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+
+          cat <<EOF > /var/www/html/index.html
+          <html>
+          <head>
+            <title>Apache on Amazon Linux 2023</title>
+          </head>
+          <body>
+            <h1>EC2 Instance Created via CloudFormation</h1>
+            <p>Amazon Linux 2023 | Apache Installed Successfully</p>
+          </body>
+          </html>
+          EOF
+
+      Tags:
+        - Key: Name
+          Value: cf-al2023-apache-ec2
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref WebEC2Instance
+
+  PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt WebEC2Instance.PublicIp

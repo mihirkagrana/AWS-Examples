@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 instance in existing VPC with AL2023, SSM access, public IP, and Apache installed
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-0f4b18edf796236e7
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0fdd1546148cb9fd0
+
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    Description: EC2 instance type
+
+Resources:
+  ## Security Group
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH, HTTP and HTTPS from anywhere
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: ec2-web-sg
+
+  ## IAM Role for SSM
+  EC2SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Path: /
+
+  ## Instance Profile
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EC2SSMRole
+
+  ## EC2 Instance
+  WebEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref EC2InstanceProfile
+
+      ## Latest Amazon Linux 2023 AMI via SSM
+      ImageId: !Sub "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64}}"
+
+      ## Ensure Public IP
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref WebSecurityGroup
+
+      Tags:
+        - Key: Name
+          Value: cf-al2023-apache-ec2
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref WebEC2Instance
+
+  PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt WebEC2Instance.PublicIp
