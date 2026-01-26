@@ -36,7 +36,8 @@ aws ec2 disassociate-route-table \
   --association-id "$ASSOC_ID"
 
 # Delete the route table
-# This will not work as its main route table
+# This will not work as its main route table. 
+# Main route table will be deleted automatically when we delete VPC below.
 # aws ec2 delete-route-table \
 #   --route-table-id "$RT_ID"
 

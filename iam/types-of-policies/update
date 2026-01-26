@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+yq -o json policy.yml > policy.json
+
+## Create policy version
+aws iam create-policy-version \
+    --policy-arn arn:aws:iam::741181707369:policy/test-policy \
+    --policy-document "$(yq -o json policy.yml)" \
+    --set-as-default
