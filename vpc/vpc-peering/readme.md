@@ -1,6 +1,6 @@
 ## Create 2 VPCs from AWS console - single AZ, 1 public subnets, 0 private subnect
-## VPC A with CIDR range 10.0.0.0/16
-## VPC B with CIDR range 11.0.0.0/16
+# VPC A with CIDR range 10.0.0.0/16
+# VPC B with CIDR range 11.0.0.0/16
 
 ## Run following command to add peering connection
 ```sh
