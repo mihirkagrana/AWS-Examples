@@ -1,7 +1,9 @@
 # VPC Peering steps
+Here are simple steps to test VPC peering. You will need to create 2 VPCs and EC2 instance in each VPC to test it out.  
+It includes steps from AWS console, CLI commands and CloudFormation templates to accomplish the steps.
 
 ## Create 2 VPCs from AWS console
-VPCs should single AZ, 1 public subnets, 0 private subnect  
+Both VPCs should be single AZ with 1 public subnet and 0 private subnect  
 VPC A with CIDR range 10.0.0.0/16  
 VPC B with CIDR range 11.0.0.0/16
 
@@ -40,9 +42,10 @@ wget -qO - http://3.110.33.23
 wget -qO - http://11.0.1.68
 ```
 
-# Verification of VPC peering
-## To prove our peering works, go to route table for VPC B and remove route for internet gateway.
+## Verification of VPC peering
+### To prove our peering works, go to route table for VPC B and remove route for internet gateway.
 This way the webpage will not be publially accessible in browser or on public iP - http://3.110.33.23/  
 But it will be accessible from instance A using private IP.
 
-## Cleanup - Delete EC2s, VPCs, Peering
+## Cleanup
+Delete EC2s, VPCs, Peering
